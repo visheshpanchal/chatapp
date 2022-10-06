@@ -32,6 +32,7 @@ async function loadFriends() {
                         <thead>
                         <th>Friend</th>
                         <th>Add</th>
+                        <th>Admin</th>
                     </thead>
                     <tbody>
                         ${addFriendsBody}
@@ -43,9 +44,16 @@ async function loadFriends() {
 
     let removeFriendsBody = "";
     for (const friend of notFriends) {
+      let isAdmin = `<td><button class="btn btn-primary" value="${friend.user.id}" onclick="modifyAdmin(this)">Add Admin</button></td>`;
+      console.log(friend);
+      if (friend.isAdmin === true) {
+        isAdmin = `<td><button class="btn btn-danger" value="${friend.user.id}" onclick="modifyAdmin(this)">Remove Admin</button></td>`;
+      }
+
       let tr = ` <tr>
-        <td>${friend.name}</td>
-        <td><button class="btn btn-danger" value="${friend.id}" onclick="removeUser(this)">Remove</button></td>
+        <td>${friend.user.name}</td>
+        <td><button class="btn btn-danger" value="${friend.user.id}" onclick="removeUser(this)">Remove</button></td>
+        ${isAdmin}
       </tr>`;
 
       removeFriendsBody += tr;
@@ -54,6 +62,7 @@ async function loadFriends() {
                         <thead>
                         <th>Friend</th>
                         <th>Remove</th>
+                        <th>Admin</th>
                     </thead>
                     <tbody>
                         ${removeFriendsBody}
@@ -98,5 +107,23 @@ async function addUser(event) {
     }
   } catch (err) {
     console.log(err);
+  }
+}
+
+async function modifyAdmin(event) {
+  let id = event.value;
+  let gId = localStorage.getItem("groupChat");
+  try {
+    let res = await axios({
+      method: "put",
+      url: api + "group/admin/modify/",
+      data: { groupId: gId, userId: id },
+    });
+
+    if (res) {
+      window.location.reload();
+    }
+  } catch (error) {
+    console.log(error);
   }
 }

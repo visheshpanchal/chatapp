@@ -11,6 +11,8 @@ router.get("/group/message", groupController.getAllMessages);
 router.get("/group/friends/list", groupController.groupFriends);
 router.delete("/group/friends/remove", groupController.removeGroupUser);
 router.post("/group/friends/add", groupController.addGroupUser);
+
+router.put("/group/admin/modify/", groupController.adminModify);
 // router.get() removeFriend
 // router.get() rename group
 

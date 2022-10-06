@@ -69,17 +69,18 @@ async function groupList(event) {
     let tableBody = document.createElement("tbody");
     let groups = res.data.data.groups;
     let self = localStorage.getItem("self");
+
     for (const group of groups) {
       let isAdmin = "";
 
-      if (Number(group.admin) === Number(self)) {
-        isAdmin = `<td><button class="btn btn-info" onclick="adminPage(this)" value="${group.id}">Admin</button></td>`;
+      if (group.isAdmin === true) {
+        isAdmin = `<td><button class="btn btn-info" onclick="adminPage(this)" value="${group.group.id}">Admin</button></td>`;
       }
 
       let tr = `
         <tr>
-        <td>${group.name}</td>
-        <td><button class="btn btn-primary" onclick="startGroupChat(this)" value="${group.id}">Start Chat</button></td>
+        <td>${group.group.name}</td>
+        <td><button class="btn btn-primary" onclick="startGroupChat(this)" value="${group.group.id}">Start Chat</button></td>
         ${isAdmin}
         </tr>
         

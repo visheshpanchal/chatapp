@@ -13,6 +13,7 @@ const models = [
   require("../models/message"),
   require("../models/group"),
   require("../models/groupMessage"),
+  require("../models/groupUser"),
 ];
 
 for (const model of models) {
@@ -24,6 +25,7 @@ const User = sequelize.models.user;
 const Message = sequelize.models.message;
 const Group = sequelize.models.group;
 const groupMessage = sequelize.models.groupMessage;
+const groupUser = sequelize.models.groupUser;
 
 // Relationships
 User.hasMany(Message, {

@@ -13,7 +13,7 @@ const Group = (sequelize) => {
       allowNull: false,
     },
 
-    admin: {
+    creator: {
       type: DataTypes.INTEGER,
     },
   });

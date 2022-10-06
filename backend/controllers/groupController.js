@@ -23,13 +23,18 @@ exports.addGroup = (req, res, next) => {
       try {
         let group = await Group.create({
           name: groupName,
-          admin: admin,
+          creator: admin,
         });
 
         try {
           users.push(Number(admin));
           for (const user of users) {
-            await GroupUser.create({ groupId: group.id, userId: user });
+            let isAdmin = decryptToken.userId === user ? true : false;
+            await GroupUser.create({
+              groupId: group.id,
+              userId: user,
+              admin: isAdmin,
+            });
           }
 
           let groupList = await GroupUser.findAll({
@@ -100,7 +105,11 @@ exports.getUserGroupInformation = (req, res, next) => {
           let id = data.dataValues.groupId;
 
           let group = await Group.findOne({ where: { id: id } });
-          responseGroup.push(group);
+
+          let obj = {};
+          obj["group"] = group;
+          obj["isAdmin"] = data.admin;
+          responseGroup.push(obj);
         }
 
         res
@@ -277,7 +286,10 @@ exports.groupFriends = (req, res, next) => {
                   attributes: ["id", "name"],
                 });
 
-                friends.push(user);
+                obj = {};
+                obj["user"] = user;
+                obj["isAdmin"] = dt.dataValues.admin;
+                friends.push(obj);
                 friendsId.push(user.id);
               } catch (err) {
                 res
@@ -376,7 +388,51 @@ exports.addGroupUser = (req, res, next) => {
         let groupUser = await GroupUser.create({
           groupId: body.groupId,
           userId: body.userId,
+          admin: false,
         });
+
+        res.status(201).json({ status: "success" });
+      } catch (err) {
+        res
+          .status(500)
+          .json({ status: "error", message: "Internal server error" });
+      }
+    });
+  } else {
+    if (!token) {
+      res
+        .status(403)
+        .json({ status: "error", message: "You need to logged in first" });
+    }
+    if (!body) {
+      res.status(205).json({ status: "error", message: "Need to resend data" });
+    }
+    res.status(205).json({ status: "error", message: "Can not find group id" });
+  }
+};
+
+exports.adminModify = (req, res, next) => {
+  token = req.headers.token;
+  body = req.body;
+  if (id && token && body) {
+    jwt.verify(token, SECRET_KEY, async function (err, decryptToken) {
+      if (err) {
+        res.status(205).json({ status: "error", message: "Bad token" });
+      }
+
+      try {
+        let user = await GroupUser.findOne({
+          where: {
+            userId: body.userId,
+            groupId: body.groupId,
+          },
+        });
+
+        if (user) {
+          user.admin = !user.admin;
+
+          await user.save();
+        }
 
         res.status(201).json({ status: "success" });
       } catch (err) {
