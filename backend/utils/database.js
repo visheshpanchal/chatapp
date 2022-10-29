@@ -45,7 +45,7 @@ Group.belongsToMany(User, {
 });
 
 // Group Message Relation
-// Include work in this type of relationship
+// Include work in this type of relationship (belongsTo)
 Group.hasMany(groupMessage, {
   onDelete: "CASCADE",
 });
